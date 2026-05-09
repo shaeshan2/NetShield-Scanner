@@ -1,0 +1,54 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+.venv/
+venv/
+ENV/
+env/
+
+.idea/
+.vscode/
+*.log
+.Python
+
+# OS / editors
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Secrets / credentials (never commit these)
+.env
+.env.*
+secrets/
+**/credentials.json
+*-credentials.json
+
+# Misc local artifacts / caches
+coverage.xml
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Scan outputs — keep directory with .gitkeep only
+reports/*
+!reports/.gitkeep

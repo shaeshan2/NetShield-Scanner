@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{TITLE}}</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121832;
+      --text: #e8ecff;
+      --muted: #a8b2d9;
+      --border: #253061;
+      --accent: #5dd6ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+        Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at 20% 0%, #212b64 0%, var(--bg) 55%);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      padding: 36px 20px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(6px);
+      background: linear-gradient(to bottom, rgba(18, 24, 50, 0.92), rgba(18, 24, 50, 0.55));
+    }
+    header h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      letter-spacing: 0.03em;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .chip {
+      background: rgba(93, 214, 255, 0.08);
+      border: 1px solid rgba(93, 214, 255, 0.25);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    main { padding: 24px 20px 40px; max-width: 1200px; margin: 0 auto; }
+    h2 {
+      margin: 36px 0 12px;
+      font-size: 20px;
+      color: var(--accent);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(18, 24, 50, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px 12px;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    th {
+      background: rgba(93, 214, 255, 0.12);
+      text-align: left;
+      white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: none; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      color: var(--muted);
+      word-break: break-all;
+    }
+    .muted { color: var(--muted); font-size: 13px; }
+    .badge {
+      display: inline-flex;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .sev-high { background: rgba(255, 80, 80, 0.15); color: #ffb3b3; border-color: rgba(255, 96, 96, 0.45); }
+    .sev-medium { background: rgba(255, 209, 102, 0.12); color: #ffd86b; border-color: rgba(255, 209, 102, 0.38); }
+    .sev-low { background: rgba(102, 255, 209, 0.10); color: #8fffe0; border-color: rgba(102, 255, 209, 0.32); }
+    pre {
+      overflow: auto;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.35);
+      color: var(--muted);
+    }
+    footer {
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+    @media (max-width: 720px) {
+      th:nth-child(n+5), td:nth-child(n+5) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>{{TITLE}}</h1>
+    <p class="muted">Generated {{GENERATED_AT}} — Authorized defensive auditing only.</p>
+    <div class="meta-grid">
+      <div class="chip"><strong>Targets</strong><div class="muted">{{TARGET_LIST}}</div></div>
+      <div class="chip"><strong>Ports scanned</strong><div class="muted">{{PORTS_LIST}}</div></div>
+      <div class="chip"><strong>Findings recorded</strong><div class="muted">{{FINDINGS_COUNT}}</div></div>
+    </div>
+  </header>
+
+  <main>
+    <h2>Open services snapshot</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Host</th>
+          <th>Open TCP ports</th>
+          <th>Banners (best effort)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{HOSTS_TABLE_ROWS}}
+      </tbody>
+    </table>
+
+    <h2>Defensive posture notes</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Severity</th>
+          <th>Title</th>
+          <th>Host</th>
+          <th>Port</th>
+          <th>Explanation</th>
+          <th>Recommendation</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{FINDINGS_TABLE_ROWS}}
+      </tbody>
+    </table>
+
+    <h2>Technical metadata snapshot</h2>
+    {{JSON_OVERVIEW}}
+
+    <footer>
+      Authorized defensive assessment only: benign TCP connects and light banner reads.
+      No exploitation, brute forcing, stealth/evasion scanning, or credential attacks.
+      Use only where you hold written authorization.
+    </footer>
+  </main>
+</body>
+</html>
