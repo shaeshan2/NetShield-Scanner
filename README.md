@@ -144,6 +144,86 @@ Your exact wording will mirror whatever services were reachable from your workst
 
 ---
 
+## Lab validation
+
+NetShield Scanner was exercised in an **authorized, single-host lab** inside an **Ubuntu guest VM** hosted with **UTM on macOS**. The VM’s network posture was deliberate and **fully under my control**—this was **inventory-style connectivity testing**, not penetration testing or exploitation against third parties.
+
+- **Scan target:** `127.0.0.1` (loopback on the Ubuntu lab guest only).
+- **Default checklist:** **15 common TCP ports** per host (`python main.py --target 127.0.0.1`).
+- **Open services observed:** **5** — FTP (**21**), SSH (**22**), Telnet (**23**), HTTP (**80**), MySQL (**3306**).
+- **Defensive findings emitted:** **5** total — severity mix **2 High**, **2 Medium**, **1 Low** (posture-focused rubric).
+- **Outputs:** Timestamped **JSON** and **HTML** written under `reports/` for repeatable review.
+
+Ground truth checks used **`sudo ss -tulnp`** on the Ubuntu guest to correlate listening processes with scanner-reported open ports. **Screenshots documenting the run are placeholders below** (`docs/screenshots/`); copy your lab captures into those paths when publishing the README so GitHub renders the images.
+
+Nothing in this section describes exploiting vulnerabilities or escalating access—only **benign connects**, **banner reads**, and **defensive triage narratives**.
+
+---
+
+## Measured results (lab snapshot)
+
+Representative validated run against **`127.0.0.1`** with the default **15-port** checklist:
+
+| Metric | Observed |
+|--------|----------|
+| Hosts scanned | 1 (`127.0.0.1`) |
+| TCP ports in checklist | 15 |
+| Open checklist ports detected | 5 |
+| Listening services (identifiers) | FTP (21), SSH (22), Telnet (23), HTTP (80), MySQL (3306) |
+| Generated findings | 5 (`2 × High`, `2 × Medium`, `1 × Low`) |
+| Report formats | JSON + HTML |
+| OS validation command | `sudo ss -tulnp` |
+
+These numbers reflect **that lab snapshot** only; repeat runs depend on what is genuinely listening.
+
+---
+
+## Screenshots
+
+Place image files under **`docs/screenshots/`** with the filenames below (or update the Markdown paths to match yours). Omit committing raw reports if they contain banners or fingerprints you prefer not to share.
+
+### 1. Ubuntu services / environment
+
+*[Placeholder]* — Listening services, network context (`ip a`), or tooling such as **`sudo ss -tulnp`** showing expected daemons consistent with scanner output.
+
+![Ubuntu lab — network and listening services](./docs/screenshots/01-ubuntu-environment.png)
+
+### 2. Targeted scan (terminal)
+
+*[Placeholder]* — Example: run with **`--ports`** narrowed to confirm specific services (narrow scope, faster iterations).
+
+![Targeted scan — terminal](./docs/screenshots/02-terminal-targeted-scan.png)
+
+### 3. Full default checklist scan (terminal)
+
+*[Placeholder]* — Default **15-port** run against **`127.0.0.1`** including Rich severity summary and report paths under `reports/`.
+
+![Full scan — terminal](./docs/screenshots/03-terminal-full-scan.png)
+
+### 4. HTML report
+
+*[Placeholder]* — Browser view of `reports/netshield_report_*.html` (open ports, banners snapshot, defensive notes).
+
+![HTML report](./docs/screenshots/04-html-report.png)
+
+### 5. JSON report
+
+*[Placeholder]* — Structured artifact `reports/netshield_scan_*.json` (scanner metadata, ports, banners, findings).
+
+![JSON report](./docs/screenshots/05-json-report.png)
+
+---
+
+## Resume summary
+
+Adapt to your tone; keep wording aligned with **authorized lab validation** and **defensive tooling** only:
+
+- **Built and validated** a threaded Python defensive TCP posture scanner (connect + banner + heuristic findings) delivering **dual JSON/HTML reports**, verified on an Ubuntu **UTM** lab guest targeting **`127.0.0.1`** across a **15-port** checklist (**5** exposes resolved, **5** findings: **2 High / 2 Medium / 1 Low**).
+- **Correlated scanner results to host ground truth** using **`sudo ss -tulnp`**, reinforcing accurate listener inventory—not exploitation or intrusive testing.
+- **Documented reproducible artifact paths** (`reports/*.json`, `reports/*.html`) suitable for auditors, ticketing demos, or portfolio walkthroughs on **explicitly authorized** systems.
+
+---
+
 ## Publishing to GitHub (first time)
 
 From the `netshield-scanner/` directory:
@@ -185,6 +265,8 @@ Continuous integration (`.github/workflows/ci.yml`) runs on pushes/PRs to `main`
 
 ```
 netshield-scanner/
+├── docs/
+│   └── screenshots/          # Optional README evidence images (populate locally)
 ├── scanner/
 │   ├── __init__.py           # Package metadata/version
 │   ├── port_scanner.py       # Target parsing + threaded TCP probing
@@ -232,16 +314,6 @@ Curated ideas aligned with defensive goals:
 3. Pluggable Nessus-compatible JSON or SARIF exporters for SOC demos.
 4. Asyncio rewrite for gigantic host sets while respecting rate caps.
 5. Configuration file presets for compliance frameworks (PCI, CIS) expressed as declarative YAML.
-
----
-
-## Resume bullet ideas
-
-Adapt these to truthful statements about **your contribution**:
-
-- Implemented a threaded Python TCP perimeter inventory tool with JSON/HTML outputs suitable for auditors.
-- Authored heuristic risk classifications for legacy cleartext services (FTP, Telnet), SMB/RDP exposure, database listeners, HTTP/TLS imbalance, and missing service banners.
-- Hardened control flow against offline hosts/timeouts via defensive exception handling plus structured logging for portfolio demonstrations.
 
 ---
 
