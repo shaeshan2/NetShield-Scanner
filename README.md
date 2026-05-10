@@ -109,11 +109,11 @@ python main.py --target 127.0.0.1 --timeout 1.2
 
 Every successful run emits:
 
-| Output | Location |
-|--------|----------|
-| JSON machine-readable results | `reports/netshield_scan_YYYYMMDD_HHMMSS.json` |
+| Output                        | Location                                        |
+| ----------------------------- | ----------------------------------------------- |
+| JSON machine-readable results | `reports/netshield_scan_YYYYMMDD_HHMMSS.json`   |
 | HTML human-readable narrative | `reports/netshield_report_YYYYMMDD_HHMMSS.html` |
-| Styled terminal digest | Printed to stdout (Rich tables + panels) |
+| Styled terminal digest        | Printed to stdout (Rich tables + panels)        |
 
 Open the `.html` file in any browser. Use the `.json` file for ingestion into ticketing systems or Grafana/Splunk demos.
 
@@ -164,15 +164,15 @@ Nothing in this section describes exploiting vulnerabilities or escalating acces
 
 Representative validated run against **`127.0.0.1`** with the default **15-port** checklist:
 
-| Metric | Observed |
-|--------|----------|
-| Hosts scanned | 1 (`127.0.0.1`) |
-| TCP ports in checklist | 15 |
-| Open checklist ports detected | 5 |
+| Metric                           | Observed                                                 |
+| -------------------------------- | -------------------------------------------------------- |
+| Hosts scanned                    | 1 (`127.0.0.1`)                                          |
+| TCP ports in checklist           | 15                                                       |
+| Open checklist ports detected    | 5                                                        |
 | Listening services (identifiers) | FTP (21), SSH (22), Telnet (23), HTTP (80), MySQL (3306) |
-| Generated findings | 5 (`2 × High`, `2 × Medium`, `1 × Low`) |
-| Report formats | JSON + HTML |
-| OS validation command | `sudo ss -tulnp` |
+| Generated findings               | 5 (`2 × High`, `2 × Medium`, `1 × Low`)                  |
+| Report formats                   | JSON + HTML                                              |
+| OS validation command            | `sudo ss -tulnp`                                         |
 
 These numbers reflect **that lab snapshot** only; repeat runs depend on what is genuinely listening.
 
@@ -180,37 +180,37 @@ These numbers reflect **that lab snapshot** only; repeat runs depend on what is 
 
 ## Screenshots
 
-Place image files under **`docs/screenshots/`** with the filenames below (or update the Markdown paths to match yours). Omit committing raw reports if they contain banners or fingerprints you prefer not to share.
+Evidence images live under **`docs/screenshots/`**. Omit committing raw scan reports if they contain banners or fingerprints you prefer not to share.
 
 ### 1. Ubuntu services / environment
 
-*[Placeholder]* — Listening services, network context (`ip a`), or tooling such as **`sudo ss -tulnp`** showing expected daemons consistent with scanner output.
+Listening services, network context (`ip a`), or tooling such as **`sudo ss -tulnp`** showing expected daemons consistent with scanner output.
 
-![Ubuntu lab — network and listening services](./docs/screenshots/01-ubuntu-environment.png)
+![IP of VM](docs/screenshots/ip-of-vm.png)
 
 ### 2. Targeted scan (terminal)
 
-*[Placeholder]* — Example: run with **`--ports`** narrowed to confirm specific services (narrow scope, faster iterations).
+Example: run with **`--ports`** narrowed to confirm specific services (narrow scope, faster iterations).
 
-![Targeted scan — terminal](./docs/screenshots/02-terminal-targeted-scan.png)
+![Targeted Scan Terminal](docs/screenshots/targeted-scan-terminal.png)
 
 ### 3. Full default checklist scan (terminal)
 
-*[Placeholder]* — Default **15-port** run against **`127.0.0.1`** including Rich severity summary and report paths under `reports/`.
+Default **15-port** run against **`127.0.0.1`** including Rich severity summary and report paths under `reports/`.
 
-![Full scan — terminal](./docs/screenshots/03-terminal-full-scan.png)
+![Open ports on VM](docs/screenshots/open-ports-on-vm.png)
 
 ### 4. HTML report
 
-*[Placeholder]* — Browser view of `reports/netshield_report_*.html` (open ports, banners snapshot, defensive notes).
+Browser view of `reports/netshield_report_*.html` (open ports, banners snapshot, defensive notes).
 
-![HTML report](./docs/screenshots/04-html-report.png)
+![HTML Report](docs/screenshots/html-report.png)
 
 ### 5. JSON report
 
-*[Placeholder]* — Structured artifact `reports/netshield_scan_*.json` (scanner metadata, ports, banners, findings).
+Structured artifact `reports/netshield_scan_*.json` (scanner metadata, ports, banners, findings).
 
-![JSON report](./docs/screenshots/05-json-report.png)
+![JSON Report](docs/screenshots/json-report.png)
 
 ---
 
@@ -221,43 +221,6 @@ Adapt to your tone; keep wording aligned with **authorized lab validation** and 
 - **Built and validated** a threaded Python defensive TCP posture scanner (connect + banner + heuristic findings) delivering **dual JSON/HTML reports**, verified on an Ubuntu **UTM** lab guest targeting **`127.0.0.1`** across a **15-port** checklist (**5** exposes resolved, **5** findings: **2 High / 2 Medium / 1 Low**).
 - **Correlated scanner results to host ground truth** using **`sudo ss -tulnp`**, reinforcing accurate listener inventory—not exploitation or intrusive testing.
 - **Documented reproducible artifact paths** (`reports/*.json`, `reports/*.html`) suitable for auditors, ticketing demos, or portfolio walkthroughs on **explicitly authorized** systems.
-
----
-
-## Publishing to GitHub (first time)
-
-From the `netshield-scanner/` directory:
-
-1. Confirm only source + templates are staged (reports and `.venv` must stay ignored):
-
-   ```bash
-   git status
-   ```
-
-2. Initialize the repo once (skip if `.git/` already exists):
-
-   ```bash
-   git init
-   git branch -M main
-   ```
-
-3. Add the remote once and publish:
-
-   ```bash
-   git remote add origin https://github.com/shaeshan2/NetShield-Scanner.git
-   git push -u origin main
-   ```
-
-   If `origin` already exists with another URL:
-
-   ```bash
-   git remote set-url origin https://github.com/shaeshan2/NetShield-Scanner.git
-   git push -u origin main
-   ```
-
-`reports/` stays empty except for `.gitkeep` in Git; JSON/HTML artifacts from your VM tests should never be committed—they may contain sensitive hostnames or banners.
-
-Continuous integration (`.github/workflows/ci.yml`) runs on pushes/PRs to `main`: compile check, `--help`, and a fast localhost probe.
 
 ---
 
@@ -291,15 +254,15 @@ netshield-scanner/
 
 Every finding includes **title**, **severity** (`Low`, `Medium`, `High`), **affected host**, **affected port** (nullable), **plain-language explanation**, and **recommended hardening**:
 
-| Observation | Severity (typical) |
-|-------------|---------------------|
-| TCP 21 reachable | Medium |
-| TCP 23 reachable | High |
-| TCP 139/445 reachable together | High |
-| TCP 3389 reachable | High |
-| Known DB ports reachable (`3306`, `5432` in checklist) | High |
-| Port 80 open while **443 was part of your scan scope** yet remains closed | Medium |
-| Open port lacked a recognizable banner fingerprint | Low |
+| Observation                                                               | Severity (typical) |
+| ------------------------------------------------------------------------- | ------------------ |
+| TCP 21 reachable                                                          | Medium             |
+| TCP 23 reachable                                                          | High               |
+| TCP 139/445 reachable together                                            | High               |
+| TCP 3389 reachable                                                        | High               |
+| Known DB ports reachable (`3306`, `5432` in checklist)                    | High               |
+| Port 80 open while **443 was part of your scan scope** yet remains closed | Medium             |
+| Open port lacked a recognizable banner fingerprint                        | Low                |
 
 Interpret severities **qualitatively**—they summarize attack-surface commonsense rather than validating active exploitation.
 
