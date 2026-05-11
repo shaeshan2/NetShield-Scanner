@@ -290,18 +290,6 @@ Interpret severities **qualitatively**; they summarize attack surface sense rath
 
 ---
 
-## Future improvements
-
-Curated ideas aligned with defensive goals:
-
-1. IPv6 equivalents with parallel address expansion controls.
-2. Optional TLS aware metadata (certificate expiry, SAN coverage) strictly over normal TLS handshakes.
-3. Pluggable Nessus compatible JSON or SARIF exporters for SOC demos.
-4. Asyncio rewrite for gigantic host sets while respecting rate caps.
-5. Configuration file presets for compliance frameworks (PCI, CIS) expressed as declarative YAML.
-
----
-
 ## Support and ethos
 
 Issues in this educational repository boil down to two categories:
