@@ -245,16 +245,6 @@ Structured artifact `reports/netshield_scan_*.json` (scanner metadata, ports, ba
 
 ---
 
-## Resume summary
-
-Adapt to your tone; keep wording aligned with **authorized lab validation** and **defensive tooling** only:
-
-- **Built and validated** a threaded Python defensive TCP posture scanner (connect plus banner plus heuristic findings) delivering **dual JSON and HTML reports**, verified on an Ubuntu **UTM** lab guest targeting **`127.0.0.1`** across a **15 port** checklist (**5** exposes resolved, **5** findings: **2 High / 2 Medium / 1 Low**).
-- **Correlated scanner results to host ground truth** using **`sudo ss -tulnp`**, reinforcing accurate listener inventory, not exploitation or intrusive testing.
-- **Documented reproducible artifact paths** (`reports/*.json`, `reports/*.html`) suitable for auditors, ticketing demos, or portfolio walkthroughs on **explicitly authorized** systems.
-
----
-
 ## Project layout recap
 
 ```
