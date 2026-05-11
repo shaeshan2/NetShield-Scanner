@@ -1,0 +1,12 @@
+# NetShield Scanner — authorized defensive lab / inventory use only.
+# Example: docker compose run --rm scanner --target HOST --timeout 1.5
+
+services:
+  scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: netshield-scanner:latest
+    volumes:
+      # Persists JSON/HTML artifacts on the host; keep scans out of version control.
+      - ./reports:/app/reports
