@@ -187,18 +187,6 @@ HTML report: /path/to/your-clone/reports/netshield_report_20260501_120000.html
 
 Your exact wording will mirror whatever services were reachable from your workstation.
 
-***
-
-## Lab validation
-
-NetShield Scanner was exercised in an **authorized, single host lab** inside an **Ubuntu guest VM** hosted with **UTM on macOS**. The VM’s network posture was deliberate and **fully under my control**. The work was **inventory style connectivity testing**, not penetration testing or exploitation against third parties.
-
-* **Scan target:** `127.0.0.1` (loopback on the Ubuntu lab guest only).
-* **Default checklist:** **15 common TCP ports** per host (`python main.py --target 127.0.0.1`).
-* **Open services observed:** **5:** FTP (**21**), SSH (**22**), Telnet (**23**), HTTP (**80**), MySQL (**3306**).
-* **Defensive findings emitted:** **5** total; severity mix **2 High**, **2 Medium**, **1 Low** (posture focused rubric).
-* **Outputs:** timestamped **JSON** and **HTML** written under `reports/` for repeatable review.
-
 Ground truth checks used **`sudo ss -tulnp`** on the Ubuntu guest to correlate listening processes with scanner reported open ports. Lab evidence screenshots are under **`docs/screenshots/`**.
 
 Nothing in this section describes exploiting vulnerabilities or escalating access; it covers **benign connects**, **banner reads**, and **defensive triage narratives**.
