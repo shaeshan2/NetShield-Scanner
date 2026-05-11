@@ -4,51 +4,51 @@
 
 **Out of scope (not included nor intended):** exploitation, brute forcing, stealth scanning, evasion tactics, credential attacks (or any spraying or guessing), or other offensive tooling. Networking stays at benign connect time behavior comparable to **`telnet` / `nc` checks**, automated with threading and timeouts only.
 
-***
+---
 
 ## Features
 
-* **IPv4 host or CIDR input:** expand `192.168.1.0/24` safely with the standard library `ipaddress` module.
-* **Default defensive port checklist:** `21,22,23,25,53,80,110,139,143,443,445,3306,3389,5432,8080` (override via `--ports`).
-* **Multithreaded TCP probes** using `concurrent.futures.ThreadPoolExecutor`.
-* **Banner grabbing** via short, read only socket operations (plus a harmless `HEAD` probe for HTTP style ports).
-* **Risk checker** with curated findings (FTP/Telnet/SMB/RDP/DB exposure patterns, HTTP/`HTTPS` posture hint, missing banners).
-* **Reports:** timestamped files in `reports/` for JSON and HTML, styled terminal output via **Rich**.
-* **Resilient core:** malformed targets are rejected with a message; offline hosts do not crash the run.
+- **IPv4 host or CIDR input:** expand `192.168.1.0/24` safely with the standard library `ipaddress` module.
+- **Default defensive port checklist:** `21,22,23,25,53,80,110,139,143,443,445,3306,3389,5432,8080` (override via `--ports`).
+- **Multithreaded TCP probes** using `concurrent.futures.ThreadPoolExecutor`.
+- **Banner grabbing** via short, read only socket operations (plus a harmless `HEAD` probe for HTTP style ports).
+- **Risk checker** with curated findings (FTP/Telnet/SMB/RDP/DB exposure patterns, HTTP/`HTTPS` posture hint, missing banners).
+- **Reports:** timestamped files in `reports/` for JSON and HTML, styled terminal output via **Rich**.
+- **Resilient core:** malformed targets are rejected with a message; offline hosts do not crash the run.
 
-***
+---
 
 ## Ethical use disclaimer
 
 NetShield Scanner produces **network traffic** (TCP connection attempts). Direct it **only**:
 
-* Toward hosts and networks inside **scopes you own** or are **contractually permitted** to assess, **and**
-* In ways consistent with applicable laws and organizational policies.
+- Toward hosts and networks inside **scopes you own** or are **contractually permitted** to assess, **and**
+- In ways consistent with applicable laws and organizational policies.
 
 **Unauthorized scanning is unethical and illegal in many jurisdictions.** If you need practice, prefer **explicitly sanctioned** environments (labs, VMs you control, deliberate vulnerable practice ranges with permission).
 
 Nothing here helps you bypass firewalls covertly or attack third parties. You are responsible for lawful, authorized use only.
 
-***
+---
 
 ## Legal notice (not legal advice)
 
 This repository distributes **portfolio / instructional code** related to benign TCP probing. Reading this section is **not** a substitute for professional legal counsel where you operate.
 
-* **No warranty.** The maintainers disclaim warranties to the fullest extent permitted; software is shipped **“AS IS.”** Bugs, misconfigurations, and environment differences are yours to validate.
-* **Your compliance.** You alone are responsible for complying with criminal law, contracts, ISP or campus or cloud acceptable use rules, workplace policy, export controls (if relevant), etc.
-* **Third party forks and misuse.** This project teaches defensive inventory patterns. Anyone who repurposes code for unlawful access or unauthorized probing acts on their own. **That misuse is outside the authors’ reasonable control**, just as with spreadsheets, compilers, or any general purpose tooling.
-* **Scan artifacts.** Logs and HTML and JSON reports can contain banners or IPs; keep them internal (`.gitignore` helps keep them **out** of Git; recheck before every `push`).
+- **No warranty.** The maintainers disclaim warranties to the fullest extent permitted; software is shipped **“AS IS.”** Bugs, misconfigurations, and environment differences are yours to validate.
+- **Your compliance.** You alone are responsible for complying with criminal law, contracts, ISP or campus or cloud acceptable use rules, workplace policy, export controls (if relevant), etc.
+- **Third party forks and misuse.** This project teaches defensive inventory patterns. Anyone who repurposes code for unlawful access or unauthorized probing acts on their own. **That misuse is outside the authors’ reasonable control**, just as with spreadsheets, compilers, or any general purpose tooling.
+- **Scan artifacts.** Logs and HTML and JSON reports can contain banners or IPs; keep them internal (`.gitignore` helps keep them **out** of Git; recheck before every `push`).
 
 If you need definitive answers for employment, coursework, penetration test contracts, international travel, or regulatory regimes, consult a lawyer qualified in **your jurisdiction**.
 
-***
+---
 
 ## License
 
 This repository is licensed under the [MIT License](LICENSE). Dependencies (currently **[Rich](https://github.com/Textualize/rich)**) carry their own terms on PyPI.
 
-***
+---
 
 ## Installation
 
@@ -69,7 +69,7 @@ python -m pip install -r requirements.txt
 
 No third party binaries are required; the scanner uses `socket` from the Python standard library and `rich` for prettier terminal output only.
 
-***
+---
 
 ## Docker usage
 
@@ -100,7 +100,7 @@ docker compose run --rm scanner --target 192.168.56.101 --workers 120
 
 **Networking note:** `--target 127.0.0.1` from a default bridge container probes **inside the container**, not your physical host. To inventory the **Docker host**, use an explicit reachable IP for a lab or LAN you control, or on **Linux** add `--network host` to reach host listeners (**authorized** targets only).
 
-***
+---
 
 ## Docker validation
 
@@ -116,7 +116,7 @@ Docker support was checked by building the image successfully, running NetShield
 
 ![Docker Compose run](docs/screenshots/docker-compose-run.png)
 
-***
+---
 
 ## Usage
 
@@ -156,13 +156,13 @@ python main.py --target 127.0.0.1 --timeout 1.2
 
 Every successful run emits:
 
-* **JSON machine readable results:** `reports/netshield_scan_YYYYMMDD_HHMMSS.json`
-* **HTML human readable narrative:** `reports/netshield_report_YYYYMMDD_HHMMSS.html`
-* **Styled terminal digest:** printed to stdout (Rich tables and panels)
+- **JSON machine readable results:** `reports/netshield_scan_YYYYMMDD_HHMMSS.json`
+- **HTML human readable narrative:** `reports/netshield_report_YYYYMMDD_HHMMSS.html`
+- **Styled terminal digest:** printed to stdout (Rich tables and panels)
 
 Open the `.html` file in any browser. Use the `.json` file for ingestion into ticketing systems or Grafana or Splunk demos.
 
-***
+---
 
 ## Sample terminal output
 
@@ -191,23 +191,23 @@ Ground truth checks used **`sudo ss -tulnp`** on the Ubuntu guest to correlate l
 
 Nothing in this section describes exploiting vulnerabilities or escalating access; it covers **benign connects**, **banner reads**, and **defensive triage narratives**.
 
-***
+---
 
 ## Measured results (lab snapshot)
 
 Representative validated run against **`127.0.0.1`** with the default **15 port** checklist:
 
-* **Hosts scanned:** 1 (`127.0.0.1`)
-* **TCP ports in checklist:** 15
-* **Open checklist ports detected:** 5
-* **Listening services (identifiers):** FTP (21), SSH (22), Telnet (23), HTTP (80), MySQL (3306)
-* **Generated findings:** 5 (`2 × High`, `2 × Medium`, `1 × Low`)
-* **Report formats:** JSON and HTML
-* **OS validation command:** `sudo ss -tulnp`
+- **Hosts scanned:** 1 (`127.0.0.1`)
+- **TCP ports in checklist:** 15
+- **Open checklist ports detected:** 5
+- **Listening services (identifiers):** FTP (21), SSH (22), Telnet (23), HTTP (80), MySQL (3306)
+- **Generated findings:** 5 (`2 × High`, `2 × Medium`, `1 × Low`)
+- **Report formats:** JSON and HTML
+- **OS validation command:** `sudo ss -tulnp`
 
 These numbers reflect **that lab snapshot** only; repeat runs depend on what is genuinely listening.
 
-***
+---
 
 ## Screenshots
 
@@ -243,17 +243,17 @@ Structured artifact `reports/netshield_scan_*.json` (scanner metadata, ports, ba
 
 ![JSON Report](docs/screenshots/json-report.png)
 
-***
+---
 
 ## Resume summary
 
 Adapt to your tone; keep wording aligned with **authorized lab validation** and **defensive tooling** only:
 
-* **Built and validated** a threaded Python defensive TCP posture scanner (connect plus banner plus heuristic findings) delivering **dual JSON and HTML reports**, verified on an Ubuntu **UTM** lab guest targeting **`127.0.0.1`** across a **15 port** checklist (**5** exposes resolved, **5** findings: **2 High / 2 Medium / 1 Low**).
-* **Correlated scanner results to host ground truth** using **`sudo ss -tulnp`**, reinforcing accurate listener inventory, not exploitation or intrusive testing.
-* **Documented reproducible artifact paths** (`reports/*.json`, `reports/*.html`) suitable for auditors, ticketing demos, or portfolio walkthroughs on **explicitly authorized** systems.
+- **Built and validated** a threaded Python defensive TCP posture scanner (connect plus banner plus heuristic findings) delivering **dual JSON and HTML reports**, verified on an Ubuntu **UTM** lab guest targeting **`127.0.0.1`** across a **15 port** checklist (**5** exposes resolved, **5** findings: **2 High / 2 Medium / 1 Low**).
+- **Correlated scanner results to host ground truth** using **`sudo ss -tulnp`**, reinforcing accurate listener inventory, not exploitation or intrusive testing.
+- **Documented reproducible artifact paths** (`reports/*.json`, `reports/*.html`) suitable for auditors, ticketing demos, or portfolio walkthroughs on **explicitly authorized** systems.
 
-***
+---
 
 ## Project layout recap
 
@@ -282,23 +282,23 @@ project/
   .gitignore
 ```
 
-***
+---
 
 ## Risk checker logic (overview)
 
 Every finding includes **title**, **severity** (`Low`, `Medium`, `High`), **affected host**, **affected port** (nullable), **plain language explanation**, and **recommended hardening**:
 
-* TCP 21 reachable: **Medium** (typical)
-* TCP 23 reachable: **High**
-* TCP 139 and 445 reachable together: **High**
-* TCP 3389 reachable: **High**
-* Known DB ports reachable (`3306`, `5432` in checklist): **High**
-* Port 80 open while **443 was part of your scan scope** yet stays closed: **Medium**
-* Open port lacked a recognizable banner fingerprint: **Low**
+- TCP 21 reachable: **Medium** (typical)
+- TCP 23 reachable: **High**
+- TCP 139 and 445 reachable together: **High**
+- TCP 3389 reachable: **High**
+- Known DB ports reachable (`3306`, `5432` in checklist): **High**
+- Port 80 open while **443 was part of your scan scope** yet stays closed: **Medium**
+- Open port lacked a recognizable banner fingerprint: **Low**
 
 Interpret severities **qualitatively**; they summarize attack surface sense rather than validating active exploitation.
 
-***
+---
 
 ## Future improvements
 
@@ -310,7 +310,7 @@ Curated ideas aligned with defensive goals:
 4. Asyncio rewrite for gigantic host sets while respecting rate caps.
 5. Configuration file presets for compliance frameworks (PCI, CIS) expressed as declarative YAML.
 
-***
+---
 
 ## Support and ethos
 
