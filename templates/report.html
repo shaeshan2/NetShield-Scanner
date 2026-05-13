@@ -105,6 +105,49 @@
       color: var(--muted);
       text-align: center;
     }
+    .exec-card {
+      background: rgba(18, 24, 50, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 8px;
+    }
+    .exec-card p { margin: 0; }
+    .metrics-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .metrics-two { grid-template-columns: 1fr; }
+    }
+    .risk-card {
+      text-align: center;
+      padding: 24px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(93, 214, 255, 0.12), rgba(18, 24, 50, 0.9));
+    }
+    .risk-score-big {
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+    .risk-band {
+      margin-top: 8px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .remediation {
+      background: rgba(18, 24, 50, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+    }
+    .remediation ul { margin: 8px 0 0 1.2em; padding: 0; }
+    .remediation li { margin: 8px 0; }
     @media (max-width: 720px) {
       th:nth-child(n+5), td:nth-child(n+5) { display: none; }
     }
@@ -122,6 +165,43 @@
   </header>
 
   <main>
+    <h2>Executive summary</h2>
+    <div class="exec-card">
+      {{EXEC_SUMMARY}}
+    </div>
+
+    <div class="metrics-two">
+      <div>
+        <h2>Scan metrics</h2>
+        <table>
+          <tbody>
+            {{SCAN_METRICS_ROWS}}
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h2>Severity breakdown</h2>
+        <table>
+          <thead>
+            <tr><th>Severity</th><th>Count</th></tr>
+          </thead>
+          <tbody>
+            {{SEVERITY_BREAKDOWN_ROWS}}
+          </tbody>
+        </table>
+        <h2>Risk posture score</h2>
+        <div class="risk-card">
+          <div class="risk-score-big">{{RISK_SCORE}}<span class="muted" style="font-size:22px;font-weight:600"> / 10</span></div>
+          <div class="risk-band"><span class="badge {{RISK_BADGE_CLASS}}">{{RISK_BAND}}</span> aggregate band</div>
+          <p class="muted" style="margin-top:12px;font-size:12px;">
+            Weighted sum of finding severities (High=3, Medium=2, Low=1), summed then capped at 10.
+            Raw points before cap: {{RISK_RAW_POINTS}}.
+            Bands: 0–3 Low, 4–6 Medium, 7–10 High. Qualitative posture only; not CVSS and not derived from exploitation.
+          </p>
+        </div>
+      </div>
+    </div>
+
     <h2>Open services snapshot</h2>
     <table>
       <thead>
@@ -136,7 +216,23 @@
       </tbody>
     </table>
 
-    <h2>Defensive posture notes</h2>
+    <h2>Findings matrix</h2>
+    <p class="muted">Condensed view for triage. See detailed table below for full text.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Host</th>
+          <th>Port</th>
+          <th>Severity</th>
+          <th>Finding title</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{FINDINGS_MATRIX_ROWS}}
+      </tbody>
+    </table>
+
+    <h2>Defensive posture notes (detail)</h2>
     <table>
       <thead>
         <tr>
@@ -153,12 +249,20 @@
       </tbody>
     </table>
 
+    <h2>Remediation checklist</h2>
+    <div class="remediation">
+      <p class="muted">Deduplicated recommendations from this run. Apply during authorized change windows.</p>
+      <ul>
+        {{REMEDIATION_ITEMS}}
+      </ul>
+    </div>
+
     <h2>Technical metadata snapshot</h2>
     {{JSON_OVERVIEW}}
 
     <footer>
       Authorized defensive assessment only: benign TCP connects and light banner reads.
-      No exploitation, brute forcing, stealth/evasion scanning, or credential attacks.
+      No exploitation, brute forcing, stealth or evasion scanning, or credential attacks.
       Use only where you hold written authorization.
     </footer>
   </main>

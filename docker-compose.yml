@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: netshield-scanner:latest
+    image: netshield-scanner
     volumes:
       # Persists JSON/HTML artifacts on the host; keep scans out of version control.
       - ./reports:/app/reports

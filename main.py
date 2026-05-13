@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 # Running `python main.py` should resolve the local `scanner` package without PYTHONPATH tweaks.
@@ -25,8 +27,9 @@ from rich.console import Console
 from scanner import __version__
 from scanner.banner_grabber import banners_for_open_ports
 from scanner.port_scanner import DEFAULT_CONNECT_TIMEOUT, DEFAULT_PORTS, flatten_targets, scan_host_ports_multithreaded
-from scanner.report_generator import build_scan_payload, print_rich_summary, save_html, save_json
+from scanner.report_generator import build_scan_payload, print_rich_summary, save_csv, save_html, save_json
 from scanner.risk_checker import Finding, analyze_host
+from scanner.scan_metrics import build_scan_metrics, compute_risk_assessment
 
 
 def _parse_ports(csv: str) -> list[int]:
@@ -106,6 +109,7 @@ def main(argv: list[str] | None = None) -> int:
 
     results_by_host: dict[str, dict] = {}
     all_findings: list[Finding] = []
+    t0 = time.monotonic()
 
     console.print("[bold cyan]Starting NetShield scan...[/bold cyan]")
     console.print(
@@ -174,6 +178,16 @@ def main(argv: list[str] | None = None) -> int:
 
         all_findings.extend(findings)
 
+    elapsed = max(0.0, time.monotonic() - t0)
+    scan_metrics = build_scan_metrics(
+        duration_seconds=elapsed,
+        hosts=expanded,
+        ports_scanned=ports,
+        results_by_host=results_by_host,
+        findings=all_findings,
+    )
+    risk_assessment = compute_risk_assessment(all_findings)
+
     metadata = {
         "name": "NetShield Scanner",
         "version": __version__,
@@ -188,16 +202,26 @@ def main(argv: list[str] | None = None) -> int:
         results_by_host=results_by_host,
         findings=all_findings,
         metadata=metadata,
+        scan_metrics=scan_metrics,
+        risk_assessment=risk_assessment,
     )
 
     try:
-        json_path = save_json(payload)
-        html_path = save_html(payload)
+        file_stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        json_path = save_json(payload, file_stamp=file_stamp)
+        html_path = save_html(payload, file_stamp=file_stamp)
+        csv_path = save_csv(payload, file_stamp=file_stamp)
     except OSError as exc:
         console.print(f"[red]Could not write reports:[/red] {exc}")
         return 1
 
-    print_rich_summary(payload=payload, json_path=json_path, html_path=html_path, console=console)
+    print_rich_summary(
+        payload=payload,
+        json_path=json_path,
+        html_path=html_path,
+        csv_path=csv_path,
+        console=console,
+    )
     return 0
 
 

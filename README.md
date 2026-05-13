@@ -1,6 +1,6 @@
 # NetShield Scanner
 
-**NetShield Scanner** is a **defensive** network posture tool for **authorized testing only**. It inventories which common TCP ports accept connections using **explicit TCP connects** (`socket`), performs banner reads that **do not change remote service state**, applies a simple **risk rubric** for defenders, and exports **JSON**, **HTML**, plus a terminal summary via **Rich**.
+**NetShield Scanner** is a **defensive** network posture tool for **authorized testing only**. It inventories which common TCP ports accept connections using **explicit TCP connects** (`socket`), performs banner reads that **do not change remote service state**, applies a simple **risk rubric** for defenders, and exports **JSON**, **HTML**, **CSV**, plus a terminal summary via **Rich** with **scan metrics** and a **qualitative posture score**.
 
 **Out of scope (not included nor intended):** exploitation, brute forcing, stealth scanning, evasion tactics, credential attacks (or any spraying or guessing), or other offensive tooling. Networking stays at benign connect time behavior comparable to **`telnet` / `nc` checks**, automated with threading and timeouts only.
 
@@ -13,8 +13,43 @@
 - **Multithreaded TCP probes** using `concurrent.futures.ThreadPoolExecutor`.
 - **Banner grabbing** via short, read only socket operations (plus a harmless `HEAD` probe for HTTP style ports).
 - **Risk checker** with curated findings (FTP/Telnet/SMB/RDP/DB exposure patterns, HTTP/`HTTPS` posture hint, missing banners).
-- **Reports:** timestamped files in `reports/` for JSON and HTML, styled terminal output via **Rich**.
+- **Reports:** timestamped **JSON**, **HTML**, and **CSV** under `reports/` (shared timestamp per run), Rich terminal summary including **scan metrics** and a **qualitative posture score**.
 - **Resilient core:** malformed targets are rejected with a message; offline hosts do not crash the run.
+
+---
+
+## Enterprise use cases
+
+Use NetShield Scanner only with **written authorization** and on **assets you may assess**. Typical defensive workflows:
+
+- **Perimeter or segment inventory** before a change freeze: confirm which checklist ports answer on approved hosts.
+- **Lab and golden image validation** after builds: compare listeners to an expected baseline.
+- **Evidence for hardening tickets** export JSON, HTML, or CSV into GRC or ITSM tools your organization allows.
+- **Dockerized CI or jump host runs** repeat the same scan with pinned images and volume mounted `reports/` for audit trails.
+
+---
+
+## Scan metrics
+
+Each run records **duration**, **hosts scanned**, **ports per host**, **total probes** (hosts × ports), **open ports found**, **findings count**, and **severity counts** (High, Medium, Low). These appear in the terminal summary, in `scan_metrics` inside the JSON payload, in the HTML **Scan metrics** table, and as repeated columns on CSV rows for spreadsheet pivots.
+
+---
+
+## Risk scoring
+
+The tool computes a **posture score from 0 to 10** by summing **3 points per High**, **2 per Medium**, and **1 per Low** finding, then **capping at 10**. The **posture band** is **Low** for scores 0–3, **Medium** for 4–6, and **High** for 7–10. This is a **qualitative rubric** for triage and reporting; it is **not** CVSS, not exploit proof, and not a substitute for a full risk program.
+
+---
+
+## Security findings matrix
+
+The HTML report includes a **findings matrix** (host, port, severity, title) for quick triage, plus the full **defensive posture notes** table with explanations and recommendations. The JSON `findings` array remains the machine readable source of truth for integrations.
+
+---
+
+## CSV export
+
+`reports/netshield_scan_YYYYMMDD_HHMMSS.csv` lists one row per finding with **host**, **port**, **service or banner** (best effort from the scan), **finding title**, **severity**, **explanation**, **recommendation**, and repeated **scan level** columns (duration, probe counts, posture score and band). If no findings are emitted, a single summary row explains that case. The terminal footer prints the CSV path next to JSON and HTML.
 
 ---
 
@@ -75,28 +110,23 @@ No third party binaries are required; the scanner uses `socket` from the Python 
 
 The image is based on **`python:3.12-slim-bookworm`** with dependencies from **`requirements.txt`**. The process runs **without root privileges** (`netshield` user). Use Docker **only** for **authorized** defensive inventories; the same [**Ethical use disclaimer**](#ethical-use-disclaimer) applies.
 
-**Build:**
+From the repository root:
 
 ```bash
-docker build -t netshield-scanner:latest .
+docker build -t netshield-scanner .
 ```
-
-**Run a scan** (arguments are passed straight through to `python main.py`):
 
 ```bash
 mkdir -p reports
-docker run --rm -v "$(pwd)/reports:/app/reports" netshield-scanner:latest \
-  --target 127.0.0.1 --ports 22,80,443 --timeout 1.0
+docker run --rm -v "$(pwd)/reports:/app/reports" netshield-scanner --target 127.0.0.1
 ```
-
-Reports appear on your host under **`./reports/`** as timestamped `.json` and `.html`. If you see **`Permission denied`** writing reports, make the folder writable (for example `chmod go+w reports` locally, or **`chown` / ACL** for UID **`65532`**, the container user).
-
-**Compose** (same volume mount):
 
 ```bash
 mkdir -p reports
-docker compose run --rm scanner --target 192.168.56.101 --workers 120
+docker compose run --rm scanner --target 127.0.0.1
 ```
+
+Optional flags (`--ports`, `--workers`, `--timeout`) work the same as native Python. Artifacts (**JSON**, **HTML**, **CSV**) land in `./reports/` on the host. If writes fail with **Permission denied**, make `reports/` writable for UID **65532** or use `chmod go+w reports` for local labs.
 
 **Networking note:** `--target 127.0.0.1` from a default bridge container probes **inside the container**, not your physical host. To inventory the **Docker host**, use an explicit reachable IP for a lab or LAN you control, or on **Linux** add `--network host` to reach host listeners (**authorized** targets only).
 
@@ -104,7 +134,7 @@ docker compose run --rm scanner --target 192.168.56.101 --workers 120
 
 ## Docker validation
 
-Docker support was checked by building the image successfully, running NetShield Scanner inside a container, writing JSON and HTML to the host `reports/` directory through a mounted volume, and invoking the scanner with Docker Compose. All checks were done in a defensive, authorized context.
+Docker support was checked by building the image successfully, running NetShield Scanner inside a container, persisting **JSON**, **HTML**, and **CSV** to the host `reports/` directory through a mounted volume, and invoking the scanner with Docker Compose. All checks were done in a defensive, authorized context.
 
 ![Docker build success](docs/screenshots/docker-build-success.png)
 
@@ -156,11 +186,12 @@ python main.py --target 127.0.0.1 --timeout 1.2
 
 Every successful run emits:
 
-- **JSON machine readable results:** `reports/netshield_scan_YYYYMMDD_HHMMSS.json`
-- **HTML human readable narrative:** `reports/netshield_report_YYYYMMDD_HHMMSS.html`
-- **Styled terminal digest:** printed to stdout (Rich tables and panels)
+- **JSON:** `reports/netshield_scan_YYYYMMDD_HHMMSS.json` (includes `scan_metrics` and `risk_assessment`)
+- **HTML:** `reports/netshield_report_YYYYMMDD_HHMMSS.html` (executive summary, metrics, matrix, remediation checklist)
+- **CSV:** `reports/netshield_scan_YYYYMMDD_HHMMSS.csv` (findings plus scan context columns; same timestamp stem as JSON)
+- **Terminal digest:** Rich tables (metrics, posture score, findings, paths)
 
-Open the `.html` file in any browser. Use the `.json` file for ingestion into ticketing systems or Grafana or Splunk demos.
+Open the `.html` file in any browser. Use `.json` for automation and `.csv` for spreadsheets your policy allows.
 
 ---
 
@@ -183,13 +214,16 @@ Probe complete: open TCP: 443
 
 JSON report: /path/to/your-clone/reports/netshield_scan_20260501_120000.json
 HTML report: /path/to/your-clone/reports/netshield_report_20260501_120000.html
+CSV report: /path/to/your-clone/reports/netshield_scan_20260501_120000.csv
 ```
 
 Your exact wording will mirror whatever services were reachable from your workstation.
 
-Ground truth checks used **`sudo ss -tulnp`** on the Ubuntu guest to correlate listening processes with scanner reported open ports. Lab evidence screenshots are under **`docs/screenshots/`**.
+---
 
-Nothing in this section describes exploiting vulnerabilities or escalating access; it covers **benign connects**, **banner reads**, and **defensive triage narratives**.
+## Lab validation
+
+NetShield Scanner was exercised in an **authorized Ubuntu lab VM** (UTM on macOS) against **`127.0.0.1`**, with services correlated using **`sudo ss -tulnp`**. Screenshots and measured numbers live under **Measured results** and **Screenshots** below. This validation proves defensive inventory behavior only, not exploitation.
 
 ---
 
@@ -202,7 +236,7 @@ Representative validated run against **`127.0.0.1`** with the default **15 port*
 - **Open checklist ports detected:** 5
 - **Listening services (identifiers):** FTP (21), SSH (22), Telnet (23), HTTP (80), MySQL (3306)
 - **Generated findings:** 5 (`2 × High`, `2 × Medium`, `1 × Low`)
-- **Report formats:** JSON and HTML
+- **Report formats:** JSON, HTML, and CSV
 - **OS validation command:** `sudo ss -tulnp`
 
 These numbers reflect **that lab snapshot** only; repeat runs depend on what is genuinely listening.
@@ -245,6 +279,15 @@ Structured artifact `reports/netshield_scan_*.json` (scanner metadata, ports, ba
 
 ---
 
+## Resume highlights
+
+Bullets you can adapt; keep them truthful to what you ran and shipped:
+
+- Delivered a **defensive** TCP inventory CLI with **JSON, HTML, and CSV** exports, **scan metrics**, and a **capped posture score** for stakeholder ready summaries, validated in an **authorized lab** (UTM Ubuntu, `127.0.0.1`, `ss` correlation).
+- Extended reporting with an **executive summary**, **findings matrix**, **remediation checklist**, and **Docker** packaging for repeatable, non root container runs with **volume mounted** `reports/`.
+
+---
+
 ## Project layout recap
 
 ```
@@ -256,6 +299,7 @@ project/
     port_scanner.py
     banner_grabber.py
     risk_checker.py
+    scan_metrics.py
     report_generator.py
   reports/                 (JSON and HTML artifacts; gitignored except .gitkeep)
   templates/
